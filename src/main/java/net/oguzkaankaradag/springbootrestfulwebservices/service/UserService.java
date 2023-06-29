@@ -1,18 +1,20 @@
 package net.oguzkaankaradag.springbootrestfulwebservices.service;
 
+import net.oguzkaankaradag.springbootrestfulwebservices.dto.UserDto;
 import net.oguzkaankaradag.springbootrestfulwebservices.entity.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    User createUser(User user);
 
-    User getUserBydId(Long id);
+    UserDto createUser(UserDto userDto);
 
-    List<User> getAllUsers();
+    UserDto getUserBydId(Long id);
 
-    User updateUser(Long id , User user);
+    List<UserDto> getAllUsers();
+
+    UserDto updateUser(Long id , UserDto userdto);
 
     void deleteUserById(Long id);
 }
