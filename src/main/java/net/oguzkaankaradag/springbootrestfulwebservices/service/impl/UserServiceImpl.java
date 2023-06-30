@@ -3,6 +3,8 @@ package net.oguzkaankaradag.springbootrestfulwebservices.service.impl;
 import lombok.AllArgsConstructor;
 import net.oguzkaankaradag.springbootrestfulwebservices.dto.UserDto;
 import net.oguzkaankaradag.springbootrestfulwebservices.entity.User;
+import net.oguzkaankaradag.springbootrestfulwebservices.exception.EmailAlreadyExistsException;
+import net.oguzkaankaradag.springbootrestfulwebservices.exception.ResourceNotFoundException;
 import net.oguzkaankaradag.springbootrestfulwebservices.mapper.UserMapper;
 import net.oguzkaankaradag.springbootrestfulwebservices.repository.UserRepository;
 import net.oguzkaankaradag.springbootrestfulwebservices.service.UserService;
@@ -28,6 +30,12 @@ public class UserServiceImpl implements UserService {
 
         User user = modelMapper.map(userDto, User.class);
 
+        Optional<User> optionalUser =  userRepository.findByEmail(user.getEmail());
+
+        if (optionalUser.isPresent())
+            throw new EmailAlreadyExistsException("Email already exists for user");
+
+
         User savedUser = userRepository.save(user);
 
         //convert saved user entity to dto
@@ -39,8 +47,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserBydId(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        User user = optionalUser.get();
+        User user = userRepository.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundException("User" , "id" , id));
 
         return modelMapper.map(user, UserDto.class);
     }
@@ -54,7 +62,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(Long id, UserDto userdto) {
-        User existingUser = userRepository.findById(id).get();
+        User existingUser = userRepository.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundException("User" , "id" ,id )
+        );
         existingUser.setFirstName(userdto.getFirstName());
         existingUser.setLastName(userdto.getLastName());
         existingUser.setEmail(userdto.getEmail());
